@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ภารกิจนักนำเสนอข้อมูล | IT Pro Mission</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --accent-yellow: #f59e0b;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --font-head: 'Poppins', 'Sarabun', sans-serif;
+            --font-body: 'Sarabun', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.4;
+        }
+        body::before { background: var(--accent-cyan); top: -100px; left: -100px; }
+        body::after { background: var(--accent-pink); bottom: -100px; right: -100px; }
+
+        .container {
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+            width: 100%;
+            max-width: 720px;
+            padding: 35px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(20px);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .screen { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .screen.active { display: block; opacity: 1; }
+
+        .hero-icon { font-size: 4.5rem; text-align: center; margin-bottom: 10px; animation: bounce 2s infinite ease-in-out; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        h1 {
+            font-family: var(--font-head);
+            font-size: 2.3rem;
+            text-align: center;
+            background: linear-gradient(90deg, #7c3aed, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            font-weight: 900;
+        }
+
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 1.05rem; margin-bottom: 25px; }
+
+        .rules-card {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border: 2px dashed #c4b5fd;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .rules-card h3 {
+            font-family: var(--font-head);
+            color: #6d28d9;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rules-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .rules-card li { font-size: 0.95rem; color: #4b5563; display: flex; align-items: center; gap: 8px; }
+        .rules-card li::before { content: '⚡'; color: var(--accent-cyan); }
+
+        .btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-size: 1.15rem;
+            font-family: var(--font-head);
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.25s ease;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(236, 72, 153, 0.5); }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .badge {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #475569;
+        }
+        .badge.score { color: #7c3aed; font-size: 1.1rem; }
+        .badge.timer-text { color: #db2777; font-size: 1.1rem; }
+
+        .timer-container {
+            width: 100%;
+            background: #e2e8f0;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .timer-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #06b6d4, #10b981);
+            border-radius: 6px;
+            transition: width 1s linear;
+        }
+
+        .mission-title {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            color: #7c3aed;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .question-box {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 16px;
+            border-left: 5px solid #8b5cf6;
+        }
+
+        .drop-zone {
+            background: #f5f3ff;
+            border: 2px dashed #8b5cf6;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #6d28d9;
+            margin-bottom: 20px;
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .drop-zone.drag-over { background: #ede9fe; border-color: #7c3aed; transform: scale(1.02); }
+        .drop-zone.filled { background: #d1fae5; border-color: #10b981; color: #065f46; font-weight: 700; border-style: solid; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 550px) { .options-grid { grid-template-columns: 1fr; } }
+
+        .option-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            color: #334155;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: grab;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            text-align: center;
+        }
+        .option-card:active { cursor: grabbing; }
+        .option-card:hover { border-color: #8b5cf6; background: #f8fafc; transform: translateY(-2px); }
+        .option-card.selected-click { border-color: #7c3aed; background: #ede9fe; color: #6d28d9; }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: var(--font-head);
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .action-btn:hover { background: var(--primary-hover); }
+
+        .step-container { display: none; }
+        .step-container.active { display: block; }
+
+        /* Result Screen */
+        .result-container { text-align: center; }
+        .trophy-icon { font-size: 4rem; margin-bottom: 2px; }
+        
+        .score-display-box {
+            background: linear-gradient(135deg, #f5f3ff 0%, #fbcfe8 100%);
+            border-radius: 20px;
+            padding: 18px;
+            margin: 12px 0;
+            border: 2px solid #f472b6;
+        }
+        .score-number { font-family: var(--font-head); font-size: 3rem; font-weight: 900; color: #db2777; line-height: 1; }
+        .score-total { font-size: 0.95rem; color: #6b7280; font-weight: 600; margin-top: 4px; }
+
+        .stage-results-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        @media (max-width: 600px) { .stage-results-grid { grid-template-columns: 1fr 1fr; } }
+        
+        .stage-pill {
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .evaluation-badge {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 15px;
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+
+        /* กล่องสรุปข้อที่ผิด */
+        .mistake-section {
+            text-align: left;
+            background: #fff1f2;
+            border: 2px solid #fecdd3;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .mistake-section h3 {
+            font-family: var(--font-head);
+            color: #e11d48;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mistake-item {
+            background: #ffffff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #ef4444;
+            font-size: 0.9rem;
+        }
+        .mistake-item b { color: #9f1239; }
+        .perfect-score-msg {
+            background: #ecfdf5;
+            border: 2px solid #a7f3d0;
+            color: #065f46;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: var(--font-head);
+            font-weight: 700;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. หน้าแรก -->
+        <div id="start-screen" class="screen active">
+            <div class="hero-icon">💼⏱️</div>
+            <h1>ภารกิจนักนำเสนอข้อมูล</h1>
+            <p class="subtitle">IT Mission Challenge พร้อมสรุปผลการผิดพลาดสำหรับ ม.6</p>
+            
+            <div class="rules-card">
+                <h3>📋 กติกาและการสรุปผล:</h3>
+                <ul>
+                    <li>ลุยภารกิจวิเคราะห์ข้อมูลทั้งหมด 5 ด่าน</li>
+                    <li>⏱️ จำกัดเวลาด่านละ 15 วินาที</li>
+                    <li>💡 ตอนท้ายเกมจะสรุปรายการที่ตอบผิดพร้อมเหตุผลให้ทราบทันที!</li>
+                </ul>
+            </div>
+            
+            <button class="btn" onclick="startMission()">
+                🚀 เริ่มลุยภารกิจ
+            </button>
+        </div>
+
+        <!-- 2. หน้าเล่นเกม (ด่านที่ 1-4) -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="badge" id="stage-indicator"><span>🎯</span> ด่าน 1/5</div>
+                <div class="badge timer-text" id="timer-display">⏳ 15 วินาที</div>
+                <div class="badge score" id="score-display">⭐ คะแนน: 0</div>
+            </div>
+            
+            <div class="timer-container">
+                <div id="timer-fill" class="timer-fill"></div>
+            </div>
+            
+            <div class="mission-title" id="mission-subtitle">ด่านที่ 1 : เลือกผู้รับสาร</div>
+            <div id="question-box" class="question-box">คำถามกำลังโหลด...</div>
+
+            <div id="drop-zone" class="drop-zone" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropItem(event)">
+                📥 ลากตัวเลือกมาวางที่นี่ หรือคลิกเลือกด้านล่าง
+            </div>
+
+            <div id="options-container" class="options-grid"></div>
+
+            <button class="action-btn" id="submit-btn" onclick="checkAnswer()" style="display:none;">ยืนยันคำตอบ ➔</button>
+        </div>
+
+        <!-- 3. หน้าเล่นเกมด่านที่ 5 (3 ขั้นตอน) -->
+        <div id="stage5-screen" class="screen">
+            <div class="game-header">
+                <div class="badge"><span>🔥</span> ด่าน 5 (มืออาชีพ)</div>
+                <div class="badge timer-text" id="timer-display-5">⏳ 15 วินาที</div>
+                <div class="badge score" id="score-display-5">⭐ คะแนน: 0</div>
+            </div>
+            
+            <div class="timer-container">
+                <div id="timer-fill-5" class="timer-fill"></div>
+            </div>
+
+            <div class="question-box" style="font-size: 0.95rem; margin-bottom: 12px;">
+                🏫 <b>สถานการณ์:</b> โรงเรียนต้องการประชาสัมพันธ์ “กิจกรรมวันวิทยาศาสตร์” ให้ ม.6 จำนวน 200 คน
+            </div>
+
+            <div id="step-1" class="step-container active">
+                <div class="mission-title">ขั้นที่ 1/3 : เลือกกลุ่มเป้าหมาย</div>
+                <div id="options-s5-1" class="options-grid" style="margin-top: 10px;"></div>
+            </div>
+
+            <div id="step-2" class="step-container">
+                <div class="mission-title">ขั้นที่ 2/3 : เลือกรูปแบบการนำเสนอ</div>
+                <div id="options-s5-2" class="options-grid" style="margin-top: 10px;"></div>
+            </div>
+
+            <div id="step-3" class="step-container">
+                <div class="mission-title">ขั้นที่ 3/3 : เลือกช่องทางแบ่งปัน</div>
+                <div id="options-s5-3" class="options-grid" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <!-- 4. หน้าสรุปผล -->
+        <div id="result-screen" class="screen">
+            <div class="result-container">
+                <div class="trophy-icon" id="result-emoji">🎉</div>
+                <h2 style="font-family: var(--font-head); color: #1e293b; font-size: 1.6rem; margin-bottom: 2px;">ภารกิจสำเร็จลุล่วง!</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">สรุปผลคะแนนและรายการที่ต้องทบทวน</p>
+
+                <div class="score-display-box">
+                    <div class="score-number" id="final-score">0</div>
+                    <div class="score-total">จากคะแนนเต็ม 75 คะแนน</div>
+                </div>
+
+                <div id="evaluation-text" class="evaluation-badge">ระดับการปฏิบัติภารกิจ</div>
+
+                <div class="stage-results-grid" id="stage-results-list"></div>
+
+                <!-- พื้นที่แสดงข้อที่ตอบผิดพร้อมเหตุผล -->
+                <div id="mistakes-container"></div>
+
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 15px;">
+                    ⏱️ เวลาที่ใช้ทั้งหมด: <b id="total-time" style="color: var(--text-main);">0 นาที 0 วินาที</b>
+                </div>
+
+                <button class="btn" onclick="startMission()">
+                    🔄 เริ่มทำภารกิจใหม่อีกครั้ง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const stages = [
+            {
+                title: "ด่านที่ 1 : เลือกผู้รับสาร",
+                q: "โรงเรียนต้องการประชาสัมพันธ์ “กิจกรรมปัจฉิมนิเทศ” ให้กับนักเรียนชั้น ม.6",
+                dropText: "ลากหรือคลิกเลือก 'กลุ่มเป้าหมาย' ที่นี่",
+                options: ["👨‍🏫 ครู", "👨‍🎓 นักเรียน ม.6", "👨‍👩‍👧 ผู้ปกครอง", "🌐 บุคคลทั่วไป"],
+                correct: "👨‍🎓 นักเรียน ม.6",
+                reason: "เพราะกลุ่มเป้าหมายหลักและผู้ที่จะเข้าร่วมกิจกรรมปัจฉิมนิเทศโดยตรงคือนักเรียน ม.6"
+            },
+            {
+                title: "ด่านที่ 2 : เลือกเครื่องมือ",
+                q: "“นักเรียนต้องนำเสนอผลการทำโครงงานหน้าชั้นเรียน มีทั้งข้อความ รูปภาพ ตาราง และข้อมูลสถิติ” ควรเลือกใช้เครื่องมือใด?",
+                dropText: "ลากหรือคลิกเลือก 'เครื่องมือ' ที่เหมาะสม",
+                options: ["📊 โปรแกรมนำเสนอ", "💬 โปรแกรมแชต", "🧮 เครื่องคิดเลข", "📁 โปรแกรมจัดการไฟล์"],
+                correct: "📊 โปรแกรมนำเสนอ",
+                reason: "โปรแกรมนำเสนอสามารถจัดวางข้อความ รูปภาพ ตาราง และกราฟสถิติให้อยู่ร่วมกันได้อย่างเป็นระเบียบ"
+            },
+            {
+                title: "ด่านที่ 3 : เลือกรูปแบบการนำเสนอ",
+                q: "“โรงเรียนต้องการสรุปข้อมูลสถิติการเข้าร่วมกิจกรรมของนักเรียน 500 คน ให้ผู้บริหารดูและเข้าใจได้อย่างรวดเร็ว”",
+                dropText: "ลากหรือคลิกเลือก 'รูปแบบการนำเสนอ' ที่เหมาะสม",
+                options: ["📊 กราฟ/อินโฟกราฟิก", "📝 ข้อความยาวหลายหน้า", "💬 ข้อความแชต", "📁 แฟ้มข้อมูลที่ไม่สรุป"],
+                correct: "📊 กราฟ/อินโฟกราฟิก",
+                reason: "ช่วยสรุปข้อมูลจำนวนมากให้เห็นภาพรวมและแนวโน้มได้อย่างรวดเร็วโดยไม่ต้องอ่านขี้ยาวๆ"
+            },
+            {
+                title: "ด่านที่ 4 : เลือกช่องทางแบ่งปัน",
+                q: "“ครูต้องการส่งเอกสารประกอบการเรียนให้นักเรียนในห้อง ม.6/1 เท่านั้น และไม่ต้องการให้บุคคลภายนอกเข้าถึง”",
+                dropText: "ลากหรือคลิกเลือก 'ช่องทางแบ่งปัน' ที่เหมาะสม",
+                options: ["🌐 โพสต์สาธารณะบนโซเชียล", "👥 กลุ่มออนไลน์เฉพาะนักเรียนในห้อง", "📢 เพจสาธารณะของโรงเรียน", "💬 ส่งให้บุคคลทั่วไป"],
+                correct: "👥 กลุ่มออนไลน์เฉพาะนักเรียนในห้อง",
+                reason: "ช่วยจำกัดการเข้าถึงเฉพาะสมาชิกภายในกลุ่มห้องเรียน ป้องกันบุคคลภายนอกเข้าถึงเอกสาร"
+            }
+        ];
+
+        // ข้อมูลด่านที่ 5 (3 ขั้นตอน)
+        const s5Data = [
+            {
+                step: 1,
+                title: "ด่าน 5 (ขั้น 1): เลือกกลุ่มเป้าหมาย",
+                options: ["👨‍🏫 ครู", "👨‍🎓 นักเรียน ม.6", "👨‍👩‍👧 ผู้ปกครอง", "🌐 บุคคลทั่วไป"],
+                correct: "👨‍🎓 นักเรียน ม.6",
+                reason: "งานนี้จัดสำหรับนักเรียนชั้น ม.6 จำนวน 200 คน กลุ่มเป้าหมายหลักจึงต้องเป็นนักเรียน ม.6"
+            },
+            {
+                step: 2,
+                title: "ด่าน 5 (ขั้น 2): เลือกรูปแบบการนำเสนอ",
+                options: ["📝 บทความยาว", "📊 อินโฟกราฟิก", "💬 ข้อความส่วนตัว", "📁 เก็บไว้ในเครื่อง"],
+                correct: "📊 อินโฟกราฟิก",
+                reason: "มีข้อมูลหลายรายการ (วัน เวลา สถานที่ กิจกรรม) อินโฟกราฟิกช่วยให้ผู้รับสารเข้าใจได้ง่ายและน่าสนใจ"
+            },
+            {
+                step: 3,
+                title: "ด่าน 5 (ขั้น 3): เลือกช่องทางแบ่งปัน",
+                options: ["📢 ช่องทางประชาสัมพันธ์โรงเรียน", "🔒 เก็บไว้ในคอมส่วนตัว", "💬 ส่งให้คนเดียว", "🚫 ไม่เผยแพร่"],
+                correct: "📢 ช่องทางประชาสัมพันธ์โรงเรียน",
+                reason: "เป็นช่องทางหลักที่นักเรียนกลุ่มเป้าหมายสามารถเข้าถึงข้อมูลข่าวสารของโรงเรียนได้ทั่วถึง"
+            }
+        ];
+
+        let currentStage = 0;
+        let score = 0;
+        let stageScores = [0, 0, 0, 0, 0];
+        let mistakesLog = []; // เก็บประวัติข้อที่ตอบผิด
+        let timer;
+        let timeLeft = 15;
+        let stageStartTime;
+        let totalGameStartTime;
+        let selectedAnswer = null;
+
+        let s5Step = 1;
+        let s5Score = 0;
+        let s5StartTime;
+
+        function startMission() {
+            currentStage = 0;
+            score = 0;
+            stageScores = [0, 0, 0, 0, 0];
+            mistakesLog = [];
+            totalGameStartTime = new Date();
+            
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            
+            loadStage();
+        }
+
+        function loadStage() {
+            clearInterval(timer);
+            if (currentStage >= stages.length) {
+                startStage5();
+                return;
+            }
+
+            timeLeft = 15;
+            stageStartTime = new Date();
+            selectedAnswer = null;
+            updateTimerDisplay(false);
+            document.getElementById('submit-btn').style.display = 'none';
+
+            const st = stages[currentStage];
+            document.getElementById('stage-indicator').innerHTML = `<span>🎯</span> ด่าน ${currentStage + 1}/5`;
+            document.getElementById('score-display').innerHTML = `⭐ คะแนน: ${score}`;
+            document.getElementById('mission-subtitle').innerText = st.title;
+            document.getElementById('question-box').innerText = st.q;
+            
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.innerText = st.dropText;
+            dropZone.className = "drop-zone";
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            st.options.forEach((opt) => {
+                const card = document.createElement('div');
+                card.className = 'option-card';
+                card.draggable = true;
+                card.innerText = opt;
+                
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', opt);
+                });
+
+                card.onclick = () => {
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected-click'));
+                    card.classList.add('selected-click');
+                    selectOption(opt);
+                };
+
+                optionsContainer.appendChild(card);
+            });
+
+            startTimer(false);
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+            document.getElementById('drop-zone').classList.add('drag-over');
+        }
+
+        function removeDropStyle(e) {
+            document.getElementById('drop-zone').classList.remove('drag-over');
+        }
+
+        function dropItem(e) {
+            e.preventDefault();
+            const opt = e.dataTransfer.getData('text/plain');
+            if (opt) selectOption(opt);
+        }
+
+        function selectOption(opt) {
+            selectedAnswer = opt;
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.innerText = `✅ เลือก: ${opt}`;
+            dropZone.className = "drop-zone filled";
+            document.getElementById('submit-btn').style.display = 'block';
+        }
+
+        function startTimer(isStage5) {
+            const fillId = isStage5 ? 'timer-fill-5' : 'timer-fill';
+            const displayId = isStage5 ? 'timer-display-5' : 'timer-display';
+
+            timer = setInterval(() => {
+                timeLeft--;
+                const percent = (timeLeft / 15) * 100;
+                document.getElementById(fillId).style.width = `${percent}%`;
+                document.getElementById(displayId).innerText = `⏳ ${timeLeft} วินาที`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (!isStage5) {
+                        stageScores[currentStage] = 0;
+                        mistakesLog.push({
+                            title: stages[currentStage].title,
+                            userAns: "หมดเวลา (ไม่ได้ตอบ)",
+                            correctAns: stages[currentStage].correct,
+                            reason: stages[currentStage].reason
+                        });
+                        currentStage++;
+                        loadStage();
+                    } else {
+                        handleS5Timeout();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(isStage5) {
+            const displayId = isStage5 ? 'timer-display-5' : 'timer-display';
+            const fillId = isStage5 ? 'timer-fill-5' : 'timer-fill';
+            document.getElementById(displayId).innerText = `⏳ ${timeLeft} วินาที`;
+            document.getElementById(fillId).style.width = '100%';
+        }
+
+        function checkAnswer() {
+            clearInterval(timer);
+            const st = stages[currentStage];
+            const timeElapsed = (new Date() - stageStartTime) / 1000;
+            
+            let stageEarned = 0;
+            if (selectedAnswer === st.correct) {
+                stageEarned += 10;
+                if (timeElapsed <= 10) stageEarned += 5;
+            } else {
+                stageEarned = 0;
+                mistakesLog.push({
+                    title: st.title,
+                    userAns: selectedAnswer || "ไม่ได้ตอบ",
+                    correctAns: st.correct,
+                    reason: st.reason
+                });
+            }
+
+            score += stageEarned;
+            stageScores[currentStage] = stageEarned;
+            currentStage++;
+            loadStage();
+        }
+
+        // --- ด่านที่ 5 ---
+        function startStage5() {
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('stage5-screen').classList.add('active');
+            s5Step = 1;
+            s5Score = 0;
+            loadS5Step();
+        }
+
+        function loadS5Step() {
+            clearInterval(timer);
+            timeLeft = 15;
+            s5StartTime = new Date();
+            updateTimerDisplay(true);
+            document.getElementById('score-display-5').innerHTML = `⭐ คะแนน: ${score + s5Score}`;
+
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`step-${i}`).classList.remove('active');
+            }
+            document.getElementById(`step-${s5Step}`).classList.add('active');
+
+            const container = document.getElementById(`options-s5-${s5Step}`);
+            container.innerHTML = '';
+
+            const currentData = s5Data[s5Step - 1];
+            currentData.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card';
+                btn.style.textAlign = 'center';
+                btn.style.cursor = 'pointer';
+                btn.innerText = opt;
+                btn.onclick = () => checkS5Answer(opt);
+                container.appendChild(btn);
+            });
+
+            startTimer(true);
+        }
+
+        function checkS5Answer(opt) {
+            clearInterval(timer);
+            const timeElapsed = (new Date() - s5StartTime) / 1000;
+            const currentData = s5Data[s5Step - 1];
+
+            if (opt === currentData.correct) {
+                s5Score += 10;
+                if (timeElapsed <= 10) s5Score += 5;
+            } else {
+                mistakesLog.push({
+                    title: currentData.title,
+                    userAns: opt,
+                    correctAns: currentData.correct,
+                    reason: currentData.reason
+                });
+            }
+
+            s5Step++;
+            if (s5Step <= 3) {
+                loadS5Step();
+            } else {
+                score += s5Score;
+                stageScores[4] = s5Score;
+                endGame();
+            }
+        }
+
+        function handleS5Timeout() {
+            const currentData = s5Data[s5Step - 1];
+            mistakesLog.push({
+                title: currentData.title,
+                userAns: "หมดเวลา (ไม่ได้ตอบ)",
+                correctAns: currentData.correct,
+                reason: currentData.reason
+            });
+
+            s5Step++;
+            if (s5Step <= 3) {
+                loadS5Step();
+            } else {
+                score += s5Score;
+                stageScores[4] = s5Score;
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('stage5-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            const totalTimeSec = Math.floor((new Date() - totalGameStartTime) / 1000);
+            const mins = Math.floor(totalTimeSec / 60);
+            const secs = totalTimeSec % 60;
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('total-time').innerText = `${mins} นาที ${secs} วินาที`;
+
+            const grid = document.getElementById('stage-results-list');
+            grid.innerHTML = '';
+            stageScores.forEach((s, idx) => {
+                const max = idx === 4 ? 35 : 15;
+                const pill = document.createElement('div');
+                pill.className = 'stage-pill';
+                pill.innerHTML = `ด่านที่ ${idx + 1}: <b style="color:var(--primary);">${s}/${max}</b>`;
+                grid.appendChild(pill);
+            });
+
+            // สร้างกล่องสรุปข้อที่ผิด
+            const mistakesContainer = document.getElementById('mistakes-container');
+            mistakesContainer.innerHTML = '';
+
+            if (mistakesLog.length > 0) {
+                let html = `
+                    <div class="mistake-section">
+                        <h3>❌ รายการที่ตอบผิด / ควรทบทวน (${mistakesLog.length} จุด)</h3>
+                `;
+                mistakesLog.forEach(m => {
+                    html += `
+                        <div class="mistake-item">
+                            <div><b>📌 ${m.title}</b></div>
+                            <div style="color: #e11d48; margin: 2px 0;">ตอบของคุณ: ${m.userAns}</div>
+                            <div style="color: #059669;">✅ ที่ถูก: ${m.correctAns}</div>
+                            <div style="color: #64748b; font-size: 0.85rem; margin-top: 3px;">💡 <b>เหตุผล:</b> ${m.reason}</div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                mistakesContainer.innerHTML = html;
+            } else {
+                mistakesContainer.innerHTML = `
+                    <div class="perfect-score-msg">
+                        🎉 สุดยอดมาก! คุณตอบถูกหมดทุกด่าน ไม่มีข้อผิดพลาดเลย! 🏆
+                    </div>
+                `;
+            }
+
+            let evaluation = "";
+            let emoji = "🎉";
+            if (score >= 60) { evaluation = "🥇 นักนำเสนอข้อมูลมืออาชีพ"; emoji = "👑"; }
+            else if (score >= 45) { evaluation = "🥈 นักนำเสนอข้อมูลระดับดี"; emoji = "🚀"; }
+            else if (score >= 30) { evaluation = "🥉 นักนำเสนอข้อมูลระดับเริ่มต้น"; emoji = "💡"; }
+            else { evaluation = "🔄 ควรทบทวนภารกิจอีกครั้ง"; emoji = "📚"; }
+
+            document.getElementById('evaluation-text').innerText = evaluation;
+            document.getElementById('result-emoji').innerText = emoji;
+        }
+    </script>
+</body>
+</html>
